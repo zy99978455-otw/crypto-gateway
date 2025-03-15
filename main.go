@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"crypto-gateway/utils"
+
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/joho/godotenv"
-	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 func main() {
@@ -27,11 +30,20 @@ func main() {
 	}
 	fmt.Println("Connected to Ethereum via Infura (loaded from .env)")
 
-	// 获取最新的区块号
-	blockNumber, err := client.BlockNumber(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
+	// 1. 定义一个账户地址
+    account := common.HexToAddress("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
 
-	fmt.Printf("Latest Block Number: %d\n", blockNumber)
+    // 2. 查询余额 (nil 代表最新区块)
+    balance, err := client.BalanceAt(context.Background(), account, nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // 3. 使用我们的工具进行转换
+    ethValue := utils.WeiToEther(balance)
+
+    fmt.Printf("Address: %s\n", account.Hex())
+    fmt.Printf("Balance (Wei): %s\n", balance.String())
+    // %.4f 保留4位小数
+    fmt.Printf("Balance (ETH): %.4f ETH\n", ethValue)
 }
