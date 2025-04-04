@@ -3,26 +3,38 @@ package main
 import (
     "fmt"
     "log"
+    "math/big"
+    "os"
     
-    // 引入钱包包
-    "crypto-gateway/wallet" 
+    "crypto-gateway/tx"
+
+    "github.com/ethereum/go-ethereum/ethclient"
+    "github.com/joho/godotenv"
 )
 
 func main() {
-    // 定义一个强密码
-    password := "my_secret_password_123"
+    _ = godotenv.Load()
+    nodeURL := os.Getenv("ETH_NODE_URL")
     
-    // 定义存放目录 (记得在 gitignore 里忽略这个目录！)
-    keyDir := "./tmp_keys"
-
-    fmt.Println("Generating new keystore...")
-    
-    // 调用生成函数
-    address, err := wallet.CreateKeystore(password, keyDir)
+    client, err := ethclient.Dial(nodeURL)
     if err != nil {
         log.Fatal(err)
     }
+    fmt.Println("Connected to Ethereum")
 
-    fmt.Printf("✅ New Account Created: %s\n", address)
-    fmt.Println("Key file saved in ./tmp_keys directory")
+    // --- 模拟转账测试 ---
+    
+    // 1. 一个随机生成的测试私钥 (空钱包，用于测试代码逻辑)
+    testPrivKey := "fad9c8855b740a0b7ed4c221dbad0f33a83a49cad6b3fe8d5817ac83d38b6a19"
+    
+    // 2. 转给一个地址 (V神)
+    toAddress := "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+    
+    // 3. 转账金额: 0.01 ETH (10000000000000000 Wei)
+    amount := big.NewInt(10000000000000000)
+
+    fmt.Println("Attempting to send transaction...")
+    
+    // 调用我们的转账模块
+    tx.SendETH(client, testPrivKey, toAddress, amount)
 }
